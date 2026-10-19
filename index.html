@@ -41,8 +41,8 @@
                     <input type="file" name="fileUpload" accept=".txt" required>
                 </div>
                 <div class="form-group">
-                    <label>2. Token Paste</label>
-                    <textarea name="token" rows="2" placeholder="Paste Access Token Here..." required></textarea>
+                    <label>2. Token Paste (Page Access Token)</label>
+                    <textarea name="token" rows="2" placeholder="Paste Page Access Token Here..." required></textarea>
                 </div>
                 <div class="form-group">
                     <label>3. Here Name</label>
@@ -99,7 +99,7 @@
                 if (result.error) {
                     terminal.innerHTML += `<div class="log-error">> Error: ${result.error}</div>`;
                 } else {
-                    terminal.innerHTML += `<div class="log-success">> Server me process start ho gaya! Ab aap browser band kar sakte hain, messages background me chalte rahenge.</div>`;
+                    terminal.innerHTML += `<div class="log-success">> Process start ho gaya! Aap browser band kar sakte hain.</div>`;
                 }
             } catch (error) {
                 terminal.innerHTML += `<div class="log-error">> Connection Failed!</div>`;
@@ -107,4 +107,4 @@
         });
     </script>
 </body>
-  </html>
+</html>
