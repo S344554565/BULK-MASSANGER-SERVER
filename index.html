@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>༒🅜🅡 🅢🅤🅡🅐🅙🩵 | Bulk Messenger</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        :root { --neon-green: #0f0; --dark-bg: #050505; --panel-bg: #111; --border: #0f0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--dark-bg); color: var(--neon-green);
+            font-family: 'Share Tech Mono', monospace; padding: 20px;
+            background-image: linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .header { text-align: center; font-size: 2.5rem; text-shadow: 0 0 15px var(--neon-green); margin-bottom: 20px; letter-spacing: 2px; }
+        .container { display: flex; gap: 20px; flex-wrap: wrap; }
+        .panel { background-color: var(--panel-bg); border: 1px solid var(--border); box-shadow: 0 0 10px rgba(0, 255, 0, 0.2) inset; padding: 20px; border-radius: 5px; flex: 1; min-width: 300px; }
+        .panel h2 { border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2rem; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; }
+        input, textarea { width: 100%; background-color: #000; border: 1px solid var(--border); color: var(--neon-green); padding: 10px; font-family: inherit; border-radius: 3px; outline: none; }
+        input:focus, textarea:focus { box-shadow: 0 0 8px var(--neon-green); }
+        button { width: 100%; background-color: #000; color: var(--neon-green); border: 1px solid var(--border); padding: 12px; font-family: inherit; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; text-transform: uppercase; font-weight: bold; }
+        button:hover { background-color: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); }
+        .terminal { background-color: #000; border: 1px solid var(--border); height: 400px; overflow-y: auto; padding: 15px; font-size: 0.9rem; line-height: 1.5; }
+        .log-info { color: #0f0; } .log-success { color: #00ffff; } .log-warning { color: #ffff00; } .log-error { color: #ff0000; }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: var(--border); }
+    </style>
+</head>
+<body>
+    <div class="header">༒🅜🅡 🅢🅤🅡🅐🅙🩵</div>
+
+    <div class="container">
+        <div class="panel">
+            <h2>[ CONFIGURATION ]</h2>
+            <form id="bulkForm">
+                <div class="form-group">
+                    <label>1. TXT File Upload (UIDs)</label>
+                    <input type="file" name="fileUpload" accept=".txt" required>
+                </div>
+                <div class="form-group">
+                    <label>2. Token Paste</label>
+                    <textarea name="token" rows="2" placeholder="Paste Access Token Here..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>3. Here Name</label>
+                    <input type="text" name="hereName" placeholder="Enter Here Name" required>
+                </div>
+                <div class="form-group">
+                    <label>4. Last Name</label>
+                    <input type="text" name="lastName" placeholder="Enter Last Name">
+                </div>
+                <div class="form-group">
+                    <label>5. Time (Seconds)</label>
+                    <input type="number" name="timeDelay" placeholder="e.g., 3" value="2" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>6. Group UID / IB UID</label>
+                    <input type="text" name="groupUid" placeholder="Enter Group UID">
+                </div>
+                <button type="submit">START PROCESS</button>
+            </form>
+        </div>
+
+        <div class="panel">
+            <h2>[ LIVE DASHBOARD ]</h2>
+            <div class="terminal" id="terminal">
+                <div class="log-info">> System Ready...</div>
+                <div class="log-info">> Awaiting input parameters...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const form = document.getElementById('bulkForm');
+        const eventSource = new EventSource('/api/live-logs');
+
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const logDiv = document.createElement('div');
+            logDiv.className = `log-${data.type}`;
+            logDiv.innerHTML = `[${data.time}] > ${data.message}`;
+            terminal.appendChild(logDiv);
+            terminal.scrollTop = terminal.scrollHeight;
+        };
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            terminal.innerHTML += `<div class="log-warning">> Connecting to server...</div>`;
+            
+            try {
+                const res = await fetch('/api/start-bulk', { method: 'POST', body: formData });
+                const result = await res.json();
+                
+                if (result.error) {
+                    terminal.innerHTML += `<div class="log-error">> Error: ${result.error}</div>`;
+                } else {
+                    terminal.innerHTML += `<div class="log-success">> Server me process start ho gaya! Ab aap browser band kar sakte hain, messages background me chalte rahenge.</div>`;
+                }
+            } catch (error) {
+                terminal.innerHTML += `<div class="log-error">> Connection Failed!</div>`;
+            }
+        });
+    </script>
+</body>
+  </html>
